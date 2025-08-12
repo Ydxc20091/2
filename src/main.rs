@@ -19,13 +19,7 @@ struct PoolInfo {
 }
 
 #[derive(Debug, Deserialize)]
-struct SearchResp {
-    #[serde(alias = "res", alias = "data")]
-    pools: Vec<PoolInfo>,
-    err: Option<bool>,
-}
 
-#[derive(Debug, Deserialize)]
 struct OrderResp {
     #[serde(alias = "orderId")]
     order_id: String,
@@ -48,16 +42,13 @@ async fn main() -> Result<()> {
         "https://api-data-v1.dbotx.com/kline/search?keyword={}",
         mint
     );
-    let body: SearchResp = client
+
         .get(&search_url)
         .send()
         .await?
         .json()
         .await?;
-    if body.err == Some(true) {
-        anyhow::bail!("dbot error from search endpoint");
-    }
-    let pools = body.pools;
+
     if pools.is_empty() {
         eprintln!("no pool found for {}", mint);
         return Ok(());
